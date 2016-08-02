@@ -15,7 +15,8 @@
     "clean": "nwb clean",
     "start": "nwb serve",
     "test": "nwb test",
-    "test:watch": "nwb test --server"
+    "test:watch": "nwb test --server",
+    "deploy": "gh-pages -d demo/dist"
   },
   "dependencies": {
     "react-mdl": "^1.6.1",
@@ -26,6 +27,7 @@
   },
   "devDependencies": {
     "exports-loader": "^0.6.3",
+    "gh-pages": "^0.11.0",
     "imports-loader": "^0.6.5",
     "nwb": "0.11.x",
     "react": "^15.3.0",
