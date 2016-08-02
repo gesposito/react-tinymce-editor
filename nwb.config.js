@@ -16,14 +16,14 @@ module.exports = {
       'module': {
         'loaders': [
           {
-            'test'    : require.resolve('tinymce/tinymce'),
+            'test': require.resolve('tinymce/tinymce'),
             'loaders': [
               'imports?this=>window',
               'exports?window.tinymce'
             ]
           },
           {
-            'test'    : /tinymce\/(themes|plugins)\//,
+            'test': /tinymce\/(themes|plugins)\//,
             'loaders': [
               'imports?this=>window'
             ]
