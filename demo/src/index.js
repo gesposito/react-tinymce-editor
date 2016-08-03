@@ -1,25 +1,28 @@
+/* global document */
+/* global localStorage */
+
 import React from 'react';
 import { render } from 'react-dom';
 
 import { Button } from 'react-mdl';
 
-import TinyMCE from '../../src';
-
 import 'react-mdl/extra/material.css';
 import 'react-mdl/extra/material.js';
+
+import TinyMCE from '../../src';
 
 let Demo = React.createClass({
   getInitialState() {
     return {
       'content': JSON.parse(
         localStorage.getItem('content')
-      )
-    }
+      ),
+    };
   },
 
   onChange(content) {
     this.setState({
-      content
+      content,
     });
   },
 
@@ -43,10 +46,11 @@ let Demo = React.createClass({
         </div>
       </div>
     );
-  }
+  },
+
 });
 
 render(
-  <Demo/>,
+  <Demo />,
   document.querySelector('#demo')
 );

@@ -16,23 +16,60 @@ import 'tinymce/plugins/autolink/plugin';
 import 'tinymce/plugins/autoresize/plugin';
 import 'tinymce/plugins/fullscreen/plugin';
 import 'tinymce/plugins/image/plugin';
-import 'tinymce/plugins/link/plugin';
+// import 'tinymce/plugins/link/plugin';
 import 'tinymce/plugins/media/plugin';
 import 'tinymce/plugins/paste/plugin';
 import 'tinymce/plugins/tabfocus/plugin';
 
+import './plugins/link/plugin';
+
 let _instance = 1;
 
-export default React.createClass({
-	_editor: null,
+const EVENT_HANDLERS = {
+	'change': 'onChange',
+	// change doesn't handle direct changes
+	'keyup'	:	'onChange',
+	'blur'	:	'onChange',
+	'paste'	:	'onChange',
+	'cut'		:	'onChange',
+	'undo'	:	'onChange',
 
+};
+
+const PLUGINS = [
+	'autolink',
+	'autoresize',
+	'fullscreen',
+	'image',
+	'link',
+	'media',
+	'paste',
+	'tabfocus',
+	// custom plugins
+
+];
+
+const TOOLBAR = [
+	'bold, italic, underline',
+	'link',
+	'bullist, numlist, blockquote',
+	'alignleft, aligncenter, alignright, alignjustify',
+	'indent, outdent',
+	'formatselect, fontselect, fontsizeselect',
+	'cut, copy, paste, undo, redo, removeformat',
+	'image media',
+	'fullscreen',
+
+].join(' | ');
+
+export default React.createClass({
   componentWillMount() {
-    this._id = 'tinymce-' + _instance;
+    this._id = `tinymce-${_instance}`;
     _instance++;
   },
 
   componentDidMount() {
-		const { init, onChange, setContent } = this;
+		const { setContent, bindEditorEvents } = this;
 		const { content } = this.props;
 
     // Initialize
@@ -40,32 +77,9 @@ export default React.createClass({
       'selector'    			: `#${this._id}`,
       'skin'        			: false,
       'inline'      			: false,
-      'menubar'     			: false,
-      'plugins'     			:
-				[
-		                        'autolink',
-		                        'autoresize',
-		                        'fullscreen',
-		                        'image',
-		                        'link',
-		                        'media',
-		                        'paste',
-		                        'tabfocus',
-		                        // custom plugins
-
-				],
-	    'toolbar'     			:
-				`
-														| bold, italic, underline |
-		                        | link |
-		                        | bullist, numlist, blockquote |
-		                        | alignleft, aligncenter, alignright, alignjustify |
-		                        | indent, outdent |
-		                        | formatselect, fontselect, fontsizeselect |
-		                        | cut, copy, paste, undo, redo, removeformat |
-		                        | image media |
-		                        | fullscreen |
-				`,
+      'menubar'     			: true,
+      'plugins'     			: PLUGINS,
+			'toolbar'						: TOOLBAR,
       'content_css' 			: [
         // test configurability
         // 'https://tleunen.github.io/react-mdl/styles.css'
@@ -77,42 +91,76 @@ export default React.createClass({
 				if (content) { editor.on('init', () => setContent(content)); }
 
 				// change doesn't handle direct changes
-				editor.on('blur', 	onChange);
-				editor.on('change', onChange);
-				editor.on('keyup', 	onChange);
-				editor.on('paste', 	onChange);
-				editor.on('cut', 		onChange);
-				editor.on('undo',		onChange);
-			}
+				bindEditorEvents();
+			},
+			'style_formats': [
+				{
+					'title'		: 'Image Left',
+					'selector': 'img',
+					'styles': {
+						'float' : 'left',
+						'margin': '0 10px 0 10px',
+					},
+				},
+				{
+					'title'		: 'Image Right',
+					'selector': 'img',
+					'styles': {
+						'float' : 'right',
+						'margin': '0 10px 0 10px',
+					},
+				},
+			],
+
     });
   },
 
 	componentWillUnmount() {
-		if ( this._editor ) {
-			tinymce.remove( this._editor );
+		const editor = this._editor;
+		if (editor) {
+			this.unbindEditorEvents();
+			tinymce.remove(editor);
 		}
 	},
 
 	onChange() {
-		const content = this._editor.getContent();
+		const content = (this._editor).getContent();
 		this.props.onChange(content);
 	},
 
 	setContent(content) {
-		this._editor.setContent(content);
+		(this._editor).setContent(content);
 	},
 
 	getContent() {
-		return this._editor.getContent();
+		return (this._editor).getContent();
+	},
+
+	_editor: null,
+
+	bindEditorEvents() {
+		Object.keys(EVENT_HANDLERS).map((eventName) => {
+			const eventHandler = EVENT_HANDLERS[eventName];
+			(this._editor).on(eventName, this[eventHandler]);
+		});
+	},
+
+	unbindEditorEvents() {
+		// TODO DRY
+		Object.keys(EVENT_HANDLERS).map((eventName) => {
+			const eventHandler = this[EVENT_HANDLERS[eventName]];
+			(this._editor).off(eventName, this[eventHandler]);
+		});
 	},
 
   render() {
     return (
       <textarea
-        id={ this._id }
-        ref="editor"
+				id={this._id}
+				ref="editor"
 				className="tinymce"
       />
     );
-  }
+  },
+
 });
