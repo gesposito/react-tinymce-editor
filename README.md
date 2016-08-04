@@ -4,10 +4,14 @@
 [![npm package][npm-badge]][npm]
 [![Coveralls][coveralls-badge]][coveralls]
 
-PoC for React-TinyMCE integration inspired by
+## PoC for React-TinyMCE integration inspired by
 
 * [wp-calypso](https://github.com/Automattic/wp-calypso)
 * [react-tinymce](https://github.com/instructure-react/react-tinymce)
+
+## Custom React-based Dialog
+
+![](README.gif)
 
 [build-badge]: https://img.shields.io/travis/user/repo/master.svg?style=flat-square
 [build]: https://travis-ci.org/user/repo
