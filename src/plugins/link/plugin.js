@@ -8,21 +8,21 @@
  * Contributing: http://www.tinymce.com/contributing
  */
 
-/*global tinymce:true */
+/* global tinymce:true */
 
 tinymce.PluginManager.add('link', function(editor) {
 	function createLinkList(callback) {
 		return function() {
-			var linkList = editor.settings.link_list;
+			const linkList = editor.settings.link_list;
 
-			if (typeof linkList == "string") {
+			if (typeof linkList === 'string') {
 				tinymce.util.XHR.send({
 					url: linkList,
-					success: function(text) {
+					success(text) {
 						callback(tinymce.util.JSON.parse(text));
-					}
+					},
 				});
-			} else if (typeof linkList == "function") {
+			} else if (typeof linkList === 'function') {
 				linkList(callback);
 			} else {
 				callback(linkList);
@@ -254,7 +254,9 @@ tinymce.PluginManager.add('link', function(editor) {
 			};
 		}
 
-		win = editor.windowManager.open({
+		// win = editor.windowManager.open();
+		// Shows an external Dialog
+		editor.namespaced.showLinkDialog({
 			title: 'Insert link',
 			data: data,
 			body: [
@@ -367,29 +369,29 @@ tinymce.PluginManager.add('link', function(editor) {
 				}
 
 				insertLink();
-			}
+			},
 		});
 	}
+
+	this.showDialog = showDialog;
+
+	editor.addShortcut('Meta+K', '', createLinkList(showDialog));
+	editor.addCommand('mceLink', createLinkList(showDialog));
 
 	editor.addButton('link', {
 		icon: 'link',
 		tooltip: 'Insert/edit link',
 		shortcut: 'Meta+K',
 		onclick: createLinkList(showDialog),
-		stateSelector: 'a[href]'
+		stateSelector: 'a[href]',
 	});
 
 	editor.addButton('unlink', {
 		icon: 'unlink',
 		tooltip: 'Remove link',
 		cmd: 'unlink',
-		stateSelector: 'a[href]'
+		stateSelector: 'a[href]',
 	});
-
-	editor.addShortcut('Meta+K', '', createLinkList(showDialog));
-	editor.addCommand('mceLink', createLinkList(showDialog));
-
-	this.showDialog = showDialog;
 
 	editor.addMenuItem('link', {
 		icon: 'link',
@@ -398,6 +400,6 @@ tinymce.PluginManager.add('link', function(editor) {
 		onclick: createLinkList(showDialog),
 		stateSelector: 'a[href]',
 		context: 'insert',
-		prependToContext: true
+		prependToContext: true,
 	});
 });

@@ -6,6 +6,8 @@
 
 import React from 'react';
 
+import { Dialog, DialogTitle, DialogContent, DialogActions, Textfield, Button } from 'react-mdl';
+
 import tinymce from 'tinymce/tinymce';
 import 'tinymce/themes/modern/theme';
 
@@ -20,7 +22,9 @@ import 'tinymce/plugins/image/plugin';
 import 'tinymce/plugins/media/plugin';
 import 'tinymce/plugins/paste/plugin';
 import 'tinymce/plugins/tabfocus/plugin';
+import 'tinymce/plugins/wordcount/plugin';
 
+// Customized plugins
 import './plugins/link/plugin';
 
 let _instance = 1;
@@ -41,12 +45,13 @@ const PLUGINS = [
 	'autoresize',
 	'fullscreen',
 	'image',
-	'link',
+	// 'link',
 	'media',
 	'paste',
 	'tabfocus',
+	'wordcount',
 	// custom plugins
-
+	'link',
 ];
 
 const TOOLBAR = [
@@ -63,6 +68,17 @@ const TOOLBAR = [
 ].join(' | ');
 
 export default React.createClass({
+	getInitialState() {
+		return {
+			'link': {
+				'dialog': false,
+				'text'	: '',
+				'href'	: '',
+			},
+
+		};
+	},
+
   componentWillMount() {
     this._id = `tinymce-${_instance}`;
     _instance++;
@@ -70,16 +86,19 @@ export default React.createClass({
 
   componentDidMount() {
 		const { setContent, bindEditorEvents } = this;
-		const { content } = this.props;
+		const { showLinkDialog, hideLinkDialog } = this;
+		const { mode, content } = this.props;
+
+		const isReadOnly = mode === 'readonly';
 
     // Initialize
     tinymce.init({
       'selector'    			: `#${this._id}`,
       'skin'        			: false,
       'inline'      			: false,
-      'menubar'     			: true,
-      'plugins'     			: PLUGINS,
-			'toolbar'						: TOOLBAR,
+      'menubar'     			: false,
+      'plugins'     			: !isReadOnly ? PLUGINS : [],
+			'toolbar'						: !isReadOnly ? TOOLBAR : false,
       'content_css' 			: [
         // test configurability
         // 'https://tleunen.github.io/react-mdl/styles.css'
@@ -88,9 +107,20 @@ export default React.createClass({
 			'setup'							: (editor) => {
 				this._editor = editor;
 
-				if (content) { editor.on('init', () => setContent(content)); }
+				if (content) {
+					editor.on(
+						'init',
+						() => {
+							if (mode) editor.setMode(mode);
+							setContent(content);
+						}
+					);
+				}
 
-				// change doesn't handle direct changes
+				//
+				editor.namespaced = editor.namespaced || {};
+				editor.namespaced.showLinkDialog = showLinkDialog;
+
 				bindEditorEvents();
 			},
 			'style_formats': [
@@ -114,6 +144,14 @@ export default React.createClass({
 
     });
   },
+
+	componentWillReceiveProps(nextProps) {
+		const { mode } = nextProps;
+		if (mode !== this.props.mode) {
+			// TODO trigger init
+			(this._editor).setMode(mode);
+		}
+	},
 
 	componentWillUnmount() {
 		const editor = this._editor;
@@ -153,13 +191,103 @@ export default React.createClass({
 		});
 	},
 
+	showLinkDialog(params) {
+		const editor = this._editor;
+
+		const selectedElm = editor.selection.getNode();
+		const anchorElm = editor.dom.getParent(selectedElm, 'a[href]');
+
+		const data = {};
+		data.text = anchorElm ? (anchorElm.innerText || anchorElm.textContent) : editor.selection.getContent({format: 'text'});
+		data.href = anchorElm ? editor.dom.getAttrib(anchorElm, 'href') : '';
+
+		this.setState({
+			'link': Object.assign(
+				this.state.link,
+				{
+					'text'		: data.text,
+					'href'		: data.href,
+					'dialog'	: true,
+					'onSubmit': params.onSubmit,
+				}
+			),
+		});
+	},
+
+	handleLinkChange(key, value) {
+		const { link } = this.state;
+
+		this.setState({
+			'link': Object.defineProperty(
+				link,
+				key,
+				{
+					'enumerable': true,
+					value,
+				}
+			),
+		});
+	},
+
+	handleLinkSubmit() {
+		this.hideLinkDialog(() => {
+			const { link } = this.state;
+			(this._editor).focus();
+
+			link.onSubmit({ 'data': link });
+		});
+	},
+
+	hideLinkDialog(callback) {
+		this.setState({
+			'link': Object.assign(
+				this.state.link,
+				{
+					'dialog': false,
+				}
+			),
+		}, () => {
+			if (typeof callback === 'function') {
+				callback();
+			} else {
+				(this._editor).focus();
+			}
+		});
+	},
+
   render() {
+		const { handleLinkChange, handleLinkSubmit, hideLinkDialog } = this;
+		const { link } = this.state;
+
     return (
-      <textarea
-				id={this._id}
-				ref="editor"
-				className="tinymce"
-      />
+      <section>
+				<textarea
+					id={this._id}
+					ref="editor"
+					className="tinymce"
+					style={{ 'visibility': 'hidden' }}
+				/>
+
+				<Dialog open={link.dialog}>
+          <DialogTitle>Insert Link</DialogTitle>
+          <DialogContent>
+						<Textfield
+							label="Text to display:"
+							value={link.text}
+							onChange={(e) => handleLinkChange("text", e.target.value)}
+						/>
+						<Textfield
+							label="Link to:"
+							value={link.href}
+							onChange={(e) => handleLinkChange("href", e.target.value)}
+						/>
+          </DialogContent>
+          <DialogActions>
+						<Button type="button" onClick={handleLinkSubmit}>Ok</Button>
+            <Button type="button" onClick={hideLinkDialog}>Cancel</Button>
+          </DialogActions>
+        </Dialog>
+			</section>
     );
   },
 

@@ -11,6 +11,7 @@ module.exports = {
         "no-trailing-spaces": [2, { "skipBlankLines": true }],
 
         "react/jsx-filename-extension": 0,
+        "react/jsx-indent": 0,
         "react/jsx-indent-props": 0,
         "react/prefer-es6-class": 0,
         "react/no-string-refs": 0,

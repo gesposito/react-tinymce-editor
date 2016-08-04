@@ -3,11 +3,11 @@ module.exports = {
 
   'build': {
     'externals': {
-      'react' : 'React'
+      'react' : 'React',
     },
     'global'  : 'ReactTinyMCEEditor',
     'jsNext'  : true,
-    'umd'     : true
+    'umd'     : true,
   },
 
   'webpack': {
@@ -19,18 +19,18 @@ module.exports = {
             'test': require.resolve('tinymce/tinymce'),
             'loaders': [
               'imports?this=>window',
-              'exports?window.tinymce'
-            ]
+              'exports?window.tinymce',
+            ],
           },
           {
             'test': /tinymce\/(themes|plugins)\//,
             'loaders': [
-              'imports?this=>window'
-            ]
-          }
-        ]
-      }
-    }
-  }
+              'imports?this=>window',
+            ],
+          },
+        ],
+      },
+    },
+  },
 
-}
+};

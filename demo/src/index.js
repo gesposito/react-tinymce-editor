@@ -14,6 +14,7 @@ import TinyMCE from '../../src';
 let Demo = React.createClass({
   getInitialState() {
     return {
+      'editing': true,
       'content': JSON.parse(
         localStorage.getItem('content')
       ),
@@ -26,23 +27,39 @@ let Demo = React.createClass({
     });
   },
 
+  onEdit() {
+    this.setState({
+      'editing': true,
+    });
+  },
+
   onSave() {
     localStorage.setItem('content', JSON.stringify(this.state.content));
+
+    this.setState({
+      'editing': false,
+    });
   },
 
   render() {
-    const { onChange, onSave } = this;
-    const { content } = this.state;
+    const { onChange, onEdit, onSave } = this;
+    const { content, editing } = this.state;
 
     return (
       <div style={{ 'width': 1202, 'margin': '10px auto' }}>
         <TinyMCE
+          mode={editing ? '' : 'readonly'}
           content={content}
           onChange={onChange}
         />
 
+        {/*
+          <div style={{ 'marginTop': 10, 'float': 'left' }}>
+            <Button colored raised ripple onClick={onEdit}>Edit</Button>
+          </div>
+        */}
         <div style={{ 'marginTop': 10, 'float': 'right' }}>
-          <Button colored raised ripple onClick={onSave}>Save to local storage</Button>
+          <Button colored raised ripple onClick={onSave}>Save (local storage)</Button>
         </div>
       </div>
     );
