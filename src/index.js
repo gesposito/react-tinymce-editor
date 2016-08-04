@@ -19,7 +19,9 @@ import 'tinymce/plugins/image/plugin';
 // import 'tinymce/plugins/link/plugin';
 import 'tinymce/plugins/media/plugin';
 import 'tinymce/plugins/paste/plugin';
+import 'tinymce/plugins/preview/plugin';
 import 'tinymce/plugins/tabfocus/plugin';
+import 'tinymce/plugins/textcolor/plugin';
 import 'tinymce/plugins/wordcount/plugin';
 
 // Customized plugins
@@ -48,7 +50,9 @@ const PLUGINS = [
 	// 'link',
 	'media',
 	'paste',
+	'preview',
 	'tabfocus',
+	'textcolor',
 	'wordcount',
 	// custom plugins
 	'link',
@@ -60,10 +64,10 @@ const TOOLBAR = [
 	'bullist, numlist, blockquote',
 	'alignleft, aligncenter, alignright, alignjustify',
 	'indent, outdent',
-	'formatselect, fontselect, fontsizeselect',
+	'formatselect, fontselect, fontsizeselect forecolor',
 	'cut, copy, paste, undo, redo, removeformat',
 	'image media',
-	'fullscreen',
+	'preview fullscreen',
 
 ].join(' | ');
 

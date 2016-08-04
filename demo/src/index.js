@@ -46,7 +46,7 @@ let Demo = React.createClass({
     const { content, editing } = this.state;
 
     return (
-      <div style={{ 'width': 1202, 'margin': '10px auto' }}>
+      <div style={{ 'width': 1288, 'margin': '10px auto' }}>
         <TinyMCE
           mode={editing ? '' : 'readonly'}
           content={content}
