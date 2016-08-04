@@ -6,8 +6,6 @@
 
 import React from 'react';
 
-import { Dialog, DialogTitle, DialogContent, DialogActions, Textfield, Button } from 'react-mdl';
-
 import tinymce from 'tinymce/tinymce';
 import 'tinymce/themes/modern/theme';
 
@@ -26,6 +24,8 @@ import 'tinymce/plugins/wordcount/plugin';
 
 // Customized plugins
 import './plugins/link/plugin';
+
+import LinkDialog from './dialogs/LinkDialog';
 
 let _instance = 1;
 
@@ -268,25 +268,13 @@ export default React.createClass({
 					style={{ 'visibility': 'hidden' }}
 				/>
 
-				<Dialog open={link.dialog}>
-          <DialogTitle>Insert Link</DialogTitle>
-          <DialogContent>
-						<Textfield
-							label="Text to display:"
-							value={link.text}
-							onChange={(e) => handleLinkChange("text", e.target.value)}
-						/>
-						<Textfield
-							label="Link to:"
-							value={link.href}
-							onChange={(e) => handleLinkChange("href", e.target.value)}
-						/>
-          </DialogContent>
-          <DialogActions>
-						<Button type="button" onClick={handleLinkSubmit}>Ok</Button>
-            <Button type="button" onClick={hideLinkDialog}>Cancel</Button>
-          </DialogActions>
-        </Dialog>
+				<LinkDialog
+					show={link.dialog}
+					data={link}
+					onChange={handleLinkChange}
+					onSubmit={handleLinkSubmit}
+					onCancel={hideLinkDialog}
+				/>
 			</section>
     );
   },
