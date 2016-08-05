@@ -145,6 +145,9 @@ export default React.createClass({
 					},
 				},
 			],
+			'paste_as_text'									: false,
+			'paste_remove_styles'						: false,
+			'paste_remove_styles_if_webkit'	: false,
 
     });
   },
