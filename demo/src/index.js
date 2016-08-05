@@ -9,7 +9,11 @@ import { Button } from 'react-mdl';
 import 'react-mdl/extra/material.css';
 import 'react-mdl/extra/material.js';
 
+import 'bootstrap/dist/css/bootstrap.css';
+
 import TinyMCE from '../../src';
+
+import CustomLinkDialog from '../../src/dialogs/CustomLinkDialog';
 
 let Demo = React.createClass({
   getInitialState() {
@@ -46,22 +50,39 @@ let Demo = React.createClass({
     const { content, editing } = this.state;
 
     return (
-      <div style={{ 'width': 1288, 'margin': '10px auto' }}>
-        <TinyMCE
-          mode={editing ? '' : 'readonly'}
-          content={content}
-          onChange={onChange}
-        />
+      <section style={{ 'width': 1288, 'margin': '10px auto' }}>
+        <section className="clearfix">
+          <h1>TinyMCE component with default (Material Design Lite) React Dialog</h1>
+          <TinyMCE
+            mode={editing ? '' : 'readonly'}
+            content={content}
+            onChange={onChange}
+          />
 
-        {/*
-          <div style={{ 'marginTop': 10, 'float': 'left' }}>
-            <Button colored raised ripple onClick={onEdit}>Edit</Button>
+          <div style={{ 'marginTop': 10, 'float': 'right' }}>
+            <Button colored raised ripple onClick={onSave}>Save (local storage)</Button>
           </div>
-        */}
-        <div style={{ 'marginTop': 10, 'float': 'right' }}>
-          <Button colored raised ripple onClick={onSave}>Save (local storage)</Button>
-        </div>
-      </div>
+        </section>
+
+        <section className="clearfix">
+          <h1>TinyMCE component with custom (Bootstrap) React Dialog</h1>
+          <TinyMCE
+            mode={editing ? '' : 'readonly'}
+            content={content}
+            onChange={onChange}
+            linkDialog={CustomLinkDialog}
+          />
+
+          {/*
+            <div style={{ 'marginTop': 10, 'float': 'left' }}>
+              <Button colored raised ripple onClick={onEdit}>Edit</Button>
+            </div>
+          */}
+          <div style={{ 'marginTop': 10, 'float': 'right' }}>
+            <Button colored raised ripple onClick={onSave}>Save (local storage)</Button>
+          </div>
+        </section>
+      </section>
     );
   },
 

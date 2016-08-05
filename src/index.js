@@ -27,7 +27,7 @@ import 'tinymce/plugins/wordcount/plugin';
 // Customized plugins
 import './plugins/link/plugin';
 
-import LinkDialog from './dialogs/LinkDialog';
+import BundledLinkDialog from './dialogs/LinkDialog';
 
 let _instance = 1;
 
@@ -42,35 +42,6 @@ const EVENT_HANDLERS = {
 
 };
 
-const PLUGINS = [
-	'autolink',
-	'autoresize',
-	'fullscreen',
-	'image',
-	// 'link',
-	'media',
-	'paste',
-	'preview',
-	'tabfocus',
-	'textcolor',
-	'wordcount',
-	// custom plugins
-	'link',
-];
-
-const TOOLBAR = [
-	'bold, italic, underline',
-	'link',
-	'bullist, numlist, blockquote',
-	'alignleft, aligncenter, alignright, alignjustify',
-	'indent, outdent',
-	'formatselect, fontselect, fontsizeselect forecolor',
-	'cut, copy, paste, undo, redo, removeformat',
-	'image media',
-	'preview fullscreen',
-
-].join(' | ');
-
 export default React.createClass({
 	getInitialState() {
 		return {
@@ -83,6 +54,40 @@ export default React.createClass({
 		};
 	},
 
+	getDefaultProps() {
+		return {
+      'linkDialog': BundledLinkDialog,
+			'plugins'		: [
+				'autolink',
+				'autoresize',
+				'fullscreen',
+				'image',
+				// 'link',
+				'media',
+				'paste',
+				'preview',
+				'tabfocus',
+				'textcolor',
+				'wordcount',
+				// custom plugins
+				'link',
+			],
+			'toolbar'		: [
+				'bold, italic, underline',
+				'link',
+				'bullist, numlist, blockquote',
+				'alignleft, aligncenter, alignright, alignjustify',
+				'indent, outdent',
+				'formatselect, fontselect, fontsizeselect forecolor',
+				'cut, copy, paste, undo, redo, removeformat',
+				'image media',
+				'preview fullscreen',
+
+			].join(' | '),
+
+    };
+	},
+
   componentWillMount() {
     this._id = `tinymce-${_instance}`;
     _instance++;
@@ -92,6 +97,7 @@ export default React.createClass({
 		const { setContent, bindEditorEvents } = this;
 		const { showLinkDialog, hideLinkDialog } = this;
 		const { mode, content } = this.props;
+		const { plugins, toolbar } = this.props;
 
 		const isReadOnly = mode === 'readonly';
 
@@ -101,8 +107,8 @@ export default React.createClass({
       'skin'        			: false,
       'inline'      			: false,
       'menubar'     			: false,
-      'plugins'     			: !isReadOnly ? PLUGINS : [],
-			'toolbar'						: !isReadOnly ? TOOLBAR : false,
+      'plugins'     			: !isReadOnly ? plugins : [],
+			'toolbar'						: !isReadOnly ? toolbar : false,
       'content_css' 			: [
         // test configurability
         // 'https://tleunen.github.io/react-mdl/styles.css'
@@ -205,8 +211,9 @@ export default React.createClass({
 		const anchorElm = editor.dom.getParent(selectedElm, 'a[href]');
 
 		const data = {};
-		data.text = anchorElm ? (anchorElm.innerText || anchorElm.textContent) : editor.selection.getContent({format: 'text'});
-		data.href = anchorElm ? editor.dom.getAttrib(anchorElm, 'href') : '';
+		data.text 	= anchorElm ? (anchorElm.innerText || anchorElm.textContent) : editor.selection.getContent({format: 'text'});
+		data.href 	= anchorElm ? editor.dom.getAttrib(anchorElm, 'href') : '';
+		data.target = '_blank';
 
 		this.setState({
 			'link': Object.assign(
@@ -214,6 +221,7 @@ export default React.createClass({
 				{
 					'text'		: data.text,
 					'href'		: data.href,
+					'target'	: data.target,
 					'dialog'	: true,
 					'onSubmit': params.onSubmit,
 				}
@@ -265,6 +273,9 @@ export default React.createClass({
   render() {
 		const { handleLinkChange, handleLinkSubmit, hideLinkDialog } = this;
 		const { link } = this.state;
+		const { linkDialog } = this.props;
+
+		const LinkDialog = (linkDialog);
 
     return (
       <section>
