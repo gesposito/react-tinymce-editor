@@ -9,7 +9,7 @@ export default React.createClass({
     return (
       <Modal show={show}>
         <Modal.Header>
-          <Modal.Title>Custom Link (Custom Dialog)</Modal.Title>
+          <Modal.Title>Insert/Edit Link (Custom Dialog)</Modal.Title>
         </Modal.Header>
 
         <Modal.Body>

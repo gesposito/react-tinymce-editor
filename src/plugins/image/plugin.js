@@ -86,6 +86,9 @@ tinymce.PluginManager.add('image', function(editor) {
 		var win, data = {}, dom = editor.dom, imgElm, figureElm;
 		var width, height, imageListCtrl, classListCtrl, imageDimensions = editor.settings.image_dimensions !== false;
 
+		// Create empty element to bypass logic bound to editor.windowManager.open
+		win = editor.windowManager.open({}).close();
+
 		function recalcSize() {
 			var widthCtrl, heightCtrl, newWidth, newHeight;
 
@@ -119,7 +122,7 @@ tinymce.PluginManager.add('image', function(editor) {
 			height = newHeight;
 		}
 
-		function onSubmitForm() {
+		function onSubmitForm(e) {
 			var figureElm, oldImg;
 
 			function waitLoad(imgElm) {
@@ -149,7 +152,7 @@ tinymce.PluginManager.add('image', function(editor) {
 			updateStyle();
 			recalcSize();
 
-			data = tinymce.extend(data, win.toJSON());
+			data = tinymce.extend(data, e.data);
 
 			if (!data.alt) {
 				data.alt = '';
@@ -525,8 +528,11 @@ tinymce.PluginManager.add('image', function(editor) {
 				data.style = editor.dom.serializeStyle(editor.dom.parseStyle(editor.dom.getAttrib(imgElm, 'style')));
 			}
 
+
+			// Create empty element to bypass logic bound to editor.windowManager.open
+			win = editor.windowManager.open({}).close();
 			// Advanced dialog shows general+advanced tabs
-			win = editor.windowManager.open({
+			editor.namespaced.showImageDialog({
 				title: 'Insert/edit image',
 				data: data,
 				bodyType: 'tabpanel',
@@ -573,7 +579,7 @@ tinymce.PluginManager.add('image', function(editor) {
 			});
 		} else {
 			// Simple default dialog
-			win = editor.windowManager.open({
+			editor.namespaced.showImageDialog({
 				title: 'Insert/edit image',
 				data: data,
 				body: generalFormItems,

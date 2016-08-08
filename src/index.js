@@ -15,7 +15,7 @@ import 'tinymce/skins/lightgray/skin.min.css';
 import 'tinymce/plugins/autolink/plugin';
 import 'tinymce/plugins/autoresize/plugin';
 import 'tinymce/plugins/fullscreen/plugin';
-import 'tinymce/plugins/image/plugin';
+// import 'tinymce/plugins/image/plugin';
 // import 'tinymce/plugins/link/plugin';
 import 'tinymce/plugins/media/plugin';
 import 'tinymce/plugins/paste/plugin';
@@ -25,9 +25,11 @@ import 'tinymce/plugins/textcolor/plugin';
 import 'tinymce/plugins/wordcount/plugin';
 
 // Customized plugins
+import './plugins/image/plugin';
 import './plugins/link/plugin';
 
 import BundledLinkDialog from './dialogs/LinkDialog';
+import BundledImageDialog from './dialogs/ImageDialog';
 
 let _instance = 1;
 
@@ -50,6 +52,11 @@ export default React.createClass({
 				'text'	: '',
 				'href'	: '',
 			},
+			'image': {
+				'dialog': false,
+				'src'		: '',
+				'file'	: null,
+			},
 
 		};
 	},
@@ -57,6 +64,7 @@ export default React.createClass({
 	getDefaultProps() {
 		return {
       'linkDialog': BundledLinkDialog,
+      'imageDialog': BundledImageDialog,
 			'plugins'		: [
 				'autolink',
 				'autoresize',
@@ -96,6 +104,7 @@ export default React.createClass({
   componentDidMount() {
 		const { setContent, bindEditorEvents } = this;
 		const { showLinkDialog, hideLinkDialog } = this;
+		const { showImageDialog, hideImageDialog } = this;
 		const { mode, content } = this.props;
 		const { plugins, toolbar } = this.props;
 
@@ -130,6 +139,7 @@ export default React.createClass({
 				//
 				editor.namespaced = editor.namespaced || {};
 				editor.namespaced.showLinkDialog = showLinkDialog;
+				editor.namespaced.showImageDialog = showImageDialog;
 
 				bindEditorEvents();
 			},
@@ -219,10 +229,35 @@ export default React.createClass({
 			'link': Object.assign(
 				this.state.link,
 				{
+					'dialog'	: true,
 					'text'		: data.text,
 					'href'		: data.href,
 					'target'	: data.target,
+					'onSubmit': params.onSubmit,
+				}
+			),
+		});
+	},
+
+	showImageDialog(params) {
+		const editor = this._editor;
+
+		let imgElm = editor.selection.getNode();
+		const figureElm = editor.dom.getParent(imgElm, 'figure.image');
+
+		if (figureElm) {
+			imgElm = editor.dom.select('img', figureElm)[0];
+		}
+		if (imgElm && (imgElm.nodeName != 'IMG' || imgElm.getAttribute('data-mce-object') || imgElm.getAttribute('data-mce-placeholder'))) {
+			imgElm = null;
+		}
+
+		this.setState({
+			'image': Object.assign(
+				this.state.image,
+				{
 					'dialog'	: true,
+					'src'			: imgElm ? editor.dom.getAttrib(imgElm, 'src') : '',
 					'onSubmit': params.onSubmit,
 				}
 			),
@@ -244,12 +279,36 @@ export default React.createClass({
 		});
 	},
 
+	handleImageChange(key, value) {
+		const { image } = this.state;
+
+		this.setState({
+			'image': Object.defineProperty(
+				image,
+				key,
+				{
+					'enumerable': true,
+					value,
+				}
+			),
+		});
+	},
+
 	handleLinkSubmit() {
 		this.hideLinkDialog(() => {
 			const { link } = this.state;
 			(this._editor).focus();
 
 			link.onSubmit({ 'data': link });
+		});
+	},
+
+	handleImageSubmit() {
+		this.hideImageDialog(() => {
+			const { image } = this.state;
+			(this._editor).focus();
+
+			image.onSubmit({ 'data': image });
 		});
 	},
 
@@ -270,12 +329,31 @@ export default React.createClass({
 		});
 	},
 
+	hideImageDialog(callback) {
+		this.setState({
+			'image': Object.assign(
+				this.state.image,
+				{
+					'dialog': false,
+				}
+			),
+		}, () => {
+			if (typeof callback === 'function') {
+				callback();
+			} else {
+				(this._editor).focus();
+			}
+		});
+	},
+
   render() {
 		const { handleLinkChange, handleLinkSubmit, hideLinkDialog } = this;
-		const { link } = this.state;
-		const { linkDialog } = this.props;
+		const { handleImageChange, handleImageSubmit, hideImageDialog } = this;
+		const { link, image } = this.state;
+		const { linkDialog, imageDialog } = this.props;
 
 		const LinkDialog = (linkDialog);
+		const ImageDialog = (imageDialog);
 
     return (
       <section>
@@ -292,6 +370,14 @@ export default React.createClass({
 					onChange={handleLinkChange}
 					onSubmit={handleLinkSubmit}
 					onCancel={hideLinkDialog}
+				/>
+
+				<ImageDialog
+					show={image.dialog}
+					data={image}
+					onChange={handleImageChange}
+					onSubmit={handleImageSubmit}
+					onCancel={hideImageDialog}
 				/>
 			</section>
     );

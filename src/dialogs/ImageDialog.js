@@ -8,17 +8,17 @@ export default React.createClass({
 
     return (
       <Dialog open={show}>
-        <DialogTitle>Insert/Edit Link</DialogTitle>
+        <DialogTitle>Insert/Edit image</DialogTitle>
         <DialogContent>
           <Textfield
-            label="Text to display:"
-            value={data.text}
-            onChange={(e) => onChange('text', e.target.value)}
+            label="Paste a URL:"
+            value={data.src}
+            onChange={(e) => onChange('src', e.target.value)}
           />
           <Textfield
-            label="Link to:"
-            value={data.href}
-            onChange={(e) => onChange('href', e.target.value)}
+            label=""
+            type="file"
+            onChange={(e) => onChange('file', e.target.value)}
           />
         </DialogContent>
         <DialogActions>
