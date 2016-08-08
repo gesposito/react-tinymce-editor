@@ -14,6 +14,7 @@ import 'bootstrap/dist/css/bootstrap.css';
 import TinyMCE from '../../src';
 
 import CustomLinkDialog from '../../src/dialogs/CustomLinkDialog';
+import CustomImageDialog from '../../src/dialogs/CustomImageDialog';
 
 let Demo = React.createClass({
   getInitialState() {
@@ -57,6 +58,7 @@ let Demo = React.createClass({
             mode={editing ? '' : 'readonly'}
             content={content}
             onChange={onChange}
+            imageDialog={CustomImageDialog}
           />
 
           <div style={{ 'marginTop': 10, 'float': 'right' }}>
