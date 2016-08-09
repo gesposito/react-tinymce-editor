@@ -17,7 +17,7 @@ import 'tinymce/plugins/autoresize/plugin';
 import 'tinymce/plugins/fullscreen/plugin';
 // import 'tinymce/plugins/image/plugin';
 // import 'tinymce/plugins/link/plugin';
-import 'tinymce/plugins/media/plugin';
+// import 'tinymce/plugins/media/plugin';
 import 'tinymce/plugins/paste/plugin';
 import 'tinymce/plugins/preview/plugin';
 import 'tinymce/plugins/tabfocus/plugin';
@@ -27,6 +27,9 @@ import 'tinymce/plugins/wordcount/plugin';
 // Customized plugins
 import './plugins/image/plugin';
 import './plugins/link/plugin';
+import './plugins/media/plugin';
+
+import config from './config/config';
 
 import BundledLinkDialog from './dialogs/LinkDialog';
 import BundledImageDialog from './dialogs/ImageDialog';
@@ -63,35 +66,10 @@ export default React.createClass({
 
 	getDefaultProps() {
 		return {
-      'linkDialog': BundledLinkDialog,
-      'imageDialog': BundledImageDialog,
-			'plugins'		: [
-				'autolink',
-				'autoresize',
-				'fullscreen',
-				'image',
-				// 'link',
-				'media',
-				'paste',
-				'preview',
-				'tabfocus',
-				'textcolor',
-				'wordcount',
-				// custom plugins
-				'link',
-			],
-			'toolbar'		: [
-				'bold, italic, underline',
-				'link',
-				'bullist, numlist, blockquote',
-				'alignleft, aligncenter, alignright, alignjustify',
-				'indent, outdent',
-				'formatselect, fontselect, fontsizeselect forecolor',
-				'cut, copy, paste, undo, redo, removeformat',
-				'image media',
-				'preview fullscreen',
-
-			].join(' | '),
+      'linkDialog'	: BundledLinkDialog,
+      'imageDialog'	: BundledImageDialog,
+			'plugins'			: config.plugins,
+			'toolbar'			: config.toolbar,
 
     };
 	},
@@ -103,8 +81,7 @@ export default React.createClass({
 
   componentDidMount() {
 		const { setContent, bindEditorEvents } = this;
-		const { showLinkDialog, hideLinkDialog } = this;
-		const { showImageDialog, hideImageDialog } = this;
+		const { showLinkDialog, showImageDialog } = this;
 		const { mode, content } = this.props;
 		const { plugins, toolbar } = this.props;
 
@@ -143,24 +120,7 @@ export default React.createClass({
 
 				bindEditorEvents();
 			},
-			'style_formats': [
-				{
-					'title'		: 'Image Left',
-					'selector': 'img',
-					'styles': {
-						'float' : 'left',
-						'margin': '0 10px 0 10px',
-					},
-				},
-				{
-					'title'		: 'Image Right',
-					'selector': 'img',
-					'styles': {
-						'float' : 'right',
-						'margin': '0 10px 0 10px',
-					},
-				},
-			],
+			'style_formats'									: config.style.formats,
 			'paste_as_text'									: false,
 			'paste_remove_styles'						: false,
 			'paste_remove_styles_if_webkit'	: false,
