@@ -1,6 +1,7 @@
 import React, { PropTypes } from 'react';
 
-import { Dialog, DialogTitle, DialogContent, DialogActions, Textfield, Button } from 'react-mdl';
+import { Dialog, DialogTitle, DialogContent, DialogActions } from 'react-mdl';
+import { Textfield, Button } from 'react-mdl';
 
 export default React.createClass({
   render() {

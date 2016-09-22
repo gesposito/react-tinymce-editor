@@ -1,6 +1,7 @@
 import React, { PropTypes } from 'react';
 
-import { Dialog, DialogTitle, DialogContent, DialogActions, Textfield, Button } from 'react-mdl';
+import { Dialog, DialogTitle, DialogContent, DialogActions } from 'react-mdl';
+import { Textfield, Button } from 'react-mdl';
 
 export default React.createClass({
   render() {
@@ -15,11 +16,14 @@ export default React.createClass({
             value={data.src}
             onChange={(e) => onChange('src', e.target.value)}
           />
+        {/*
+          Not supported yet
           <Textfield
             label=""
             type="file"
             onChange={(e) => onChange('file', e.target.value)}
           />
+        */}
         </DialogContent>
         <DialogActions>
           <Button type="button" onClick={onSubmit}>Ok</Button>

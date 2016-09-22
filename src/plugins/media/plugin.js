@@ -8,19 +8,19 @@
  * Contributing: http://www.tinymce.com/contributing
  */
 
-/*jshint maxlen:255 */
-/*eslint max-len:0 */
-/*global tinymce:true */
+/* jshint maxlen:255 */
+/* eslint max-len:0 */
+/* global tinymce:true */
 
 tinymce.PluginManager.add('media', function(editor, url) {
 	var urlPatterns = [
-		{regex: /youtu\.be\/([\w\-.]+)/, type: 'iframe', w: 560, h: 314, url: '//www.youtube.com/embed/$1', allowFullscreen: true},
-		{regex: /youtube\.com(.+)v=([^&]+)/, type: 'iframe', w: 560, h: 314, url: '//www.youtube.com/embed/$2', allowFullscreen: true},
-		{regex: /youtube.com\/embed\/([a-z0-9\-_]+(?:\?.+)?)/i, type: 'iframe', w: 560, h: 314, url: '//www.youtube.com/embed/$1', allowFullscreen: true},
-		{regex: /vimeo\.com\/([0-9]+)/, type: 'iframe', w: 425, h: 350, url: '//player.vimeo.com/video/$1?title=0&byline=0&portrait=0&color=8dc7dc', allowfullscreen: true},
-		{regex: /vimeo\.com\/(.*)\/([0-9]+)/, type: "iframe", w: 425, h: 350, url: "//player.vimeo.com/video/$2?title=0&amp;byline=0", allowfullscreen: true},
-		{regex: /maps\.google\.([a-z]{2,3})\/maps\/(.+)msid=(.+)/, type: 'iframe', w: 425, h: 350, url: '//maps.google.com/maps/ms?msid=$2&output=embed"', allowFullscreen: false},
-		{regex: /dailymotion\.com\/video\/([^_]+)/, type: 'iframe', w: 480, h: 270, url: '//www.dailymotion.com/embed/video/$1', allowFullscreen: true}
+		{ regex: /youtu\.be\/([\w\-.]+)/, type: 'iframe', w: 560, h: 314, url: '//www.youtube.com/embed/$1', allowFullscreen: true },
+		{ regex: /youtube\.com(.+)v=([^&]+)/, type: 'iframe', w: 560, h: 314, url: '//www.youtube.com/embed/$2', allowFullscreen: true },
+		{ regex: /youtube.com\/embed\/([a-z0-9\-_]+(?:\?.+)?)/i, type: 'iframe', w: 560, h: 314, url: '//www.youtube.com/embed/$1', allowFullscreen: true },
+		{ regex: /vimeo\.com\/([0-9]+)/, type: 'iframe', w: 425, h: 350, url: '//player.vimeo.com/video/$1?title=0&byline=0&portrait=0&color=8dc7dc', allowfullscreen: true },
+		{ regex: /vimeo\.com\/(.*)\/([0-9]+)/, type: "iframe", w: 425, h: 350, url: "//player.vimeo.com/video/$2?title=0&amp;byline=0", allowfullscreen: true },
+		{ regex: /maps\.google\.([a-z]{2,3})\/maps\/(.+)msid=(.+)/, type: 'iframe', w: 425, h: 350, url: '//maps.google.com/maps/ms?msid=$2&output=embed"', allowFullscreen: false },
+		{ regex: /dailymotion\.com\/video\/([^_]+)/, type: 'iframe', w: 480, h: 270, url: '//www.dailymotion.com/embed/video/$1', allowFullscreen: true },
 	];
 
 	var embedChange = (tinymce.Env.ie && tinymce.Env.ie <= 8) ? 'onChange' : 'onInput';
@@ -116,11 +116,11 @@ tinymce.PluginManager.add('media', function(editor, url) {
 		}
 
 		if (editor.settings.media_alt_source !== false) {
-			generalFormItems.push({name: 'source2', type: 'filepicker', filetype: 'media', size: 40, label: 'Alternative source'});
+			generalFormItems.push({ name: 'source2', type: 'filepicker', filetype: 'media', size: 40, label: 'Alternative source' });
 		}
 
 		if (editor.settings.media_poster !== false) {
-			generalFormItems.push({name: 'poster', type: 'filepicker', filetype: 'image', size: 40, label: 'Poster'});
+			generalFormItems.push({ name: 'poster', type: 'filepicker', filetype: 'image', size: 40, label: 'Poster' });
 		}
 
 		if (editor.settings.media_dimensions !== false) {
@@ -131,10 +131,10 @@ tinymce.PluginManager.add('media', function(editor, url) {
 				align: 'center',
 				spacing: 5,
 				items: [
-					{name: 'width', type: 'textbox', maxLength: 5, size: 3, onchange: recalcSize, ariaLabel: 'Width'},
-					{type: 'label', text: 'x'},
-					{name: 'height', type: 'textbox', maxLength: 5, size: 3, onchange: recalcSize, ariaLabel: 'Height'},
-					{name: 'constrain', type: 'checkbox', checked: true, text: 'Constrain proportions'}
+					{ name: 'width', type: 'textbox', maxLength: 5, size: 3, onchange: recalcSize, ariaLabel: 'Width' },
+					{ type: 'label', text: 'x'},
+					{ name: 'height', type: 'textbox', maxLength: 5, size: 3, onchange: recalcSize, ariaLabel: 'Height' },
+					{ name: 'constrain', type: 'checkbox', checked: true, text: 'Constrain proportions'}
 				]
 			});
 		}
@@ -160,7 +160,13 @@ tinymce.PluginManager.add('media', function(editor, url) {
 
 		embedTextBox[embedChange] = updateValueOnChange;
 
-		win = editor.windowManager.open({
+		//
+		editor.namespaced.getMediaData = getData;
+		editor.namespaced.getMediaHTML = dataToHtml;
+
+		// win = editor.windowManager.open(
+		// Shows an external Dialog
+		editor.namespaced.showMediaDialog({
 			title: 'Insert/edit video',
 			data: data,
 			bodyType: 'tabpanel',
@@ -196,11 +202,22 @@ tinymce.PluginManager.add('media', function(editor, url) {
 					]
 				}
 			],
-			onSubmit: function() {
+			onSubmit: function(e) {
 				var beforeObjects, afterObjects, i, y;
 
+				var info = {
+					'source1'		: e.data.source,
+					'source2'		: '',
+					'poster'		: '',
+					'embed'			: e.data.embed,
+					'width'			: e.data.width || '',
+					'height'		: e.data.height || '',
+					'constrain'	: true,
+				};
+
 				beforeObjects = editor.dom.select('img[data-mce-object]');
-				editor.insertContent(dataToHtml(this.toJSON()));
+				// editor.insertContent(dataToHtml(this.toJSON()));
+				editor.insertContent(dataToHtml(info));
 				afterObjects = editor.dom.select('img[data-mce-object]');
 
 				// Find new image placeholder so we can select it

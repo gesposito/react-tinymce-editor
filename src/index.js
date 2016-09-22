@@ -33,12 +33,13 @@ import config from './config/config';
 
 import BundledLinkDialog from './dialogs/LinkDialog';
 import BundledImageDialog from './dialogs/ImageDialog';
+import BundledMediaDialog from './dialogs/MediaDialog';
 
 let _instance = 1;
 
 const EVENT_HANDLERS = {
 	'change': 'onChange',
-	// change doesn't handle direct changes
+	// change event doesn't trigger changes immediately
 	'keyup'	:	'onChange',
 	'blur'	:	'onChange',
 	'paste'	:	'onChange',
@@ -48,6 +49,17 @@ const EVENT_HANDLERS = {
 };
 
 export default React.createClass({
+	getDefaultProps() {
+		return {
+      'linkDialog'	: BundledLinkDialog,
+      'imageDialog'	: BundledImageDialog,
+      'mediaDialog'	: BundledMediaDialog,
+			'plugins'			: config.plugins,
+			'toolbar'			: config.toolbar,
+
+    };
+	},
+
 	getInitialState() {
 		return {
 			'link': {
@@ -60,18 +72,13 @@ export default React.createClass({
 				'src'		: '',
 				'file'	: null,
 			},
+			'media': {
+				'dialog': false,
+				'source': '',
+				'embed'	: '',
+			},
 
 		};
-	},
-
-	getDefaultProps() {
-		return {
-      'linkDialog'	: BundledLinkDialog,
-      'imageDialog'	: BundledImageDialog,
-			'plugins'			: config.plugins,
-			'toolbar'			: config.toolbar,
-
-    };
 	},
 
   componentWillMount() {
@@ -81,7 +88,7 @@ export default React.createClass({
 
   componentDidMount() {
 		const { setContent, bindEditorEvents } = this;
-		const { showLinkDialog, showImageDialog } = this;
+		const { showLinkDialog, showImageDialog, showMediaDialog } = this;
 		const { mode, content } = this.props;
 		const { plugins, toolbar } = this.props;
 
@@ -113,10 +120,11 @@ export default React.createClass({
 					);
 				}
 
-				//
+				// tinymce.PluginManager.get('name') ?
 				editor.namespaced = editor.namespaced || {};
 				editor.namespaced.showLinkDialog = showLinkDialog;
 				editor.namespaced.showImageDialog = showImageDialog;
+				editor.namespaced.showMediaDialog = showMediaDialog;
 
 				bindEditorEvents();
 			},
@@ -181,7 +189,7 @@ export default React.createClass({
 		const anchorElm = editor.dom.getParent(selectedElm, 'a[href]');
 
 		const data = {};
-		data.text 	= anchorElm ? (anchorElm.innerText || anchorElm.textContent) : editor.selection.getContent({format: 'text'});
+		data.text 	= anchorElm ? (anchorElm.innerText || anchorElm.textContent) : editor.selection.getContent({ format: 'text' });
 		data.href 	= anchorElm ? editor.dom.getAttrib(anchorElm, 'href') : '';
 		data.target = '_blank';
 
@@ -224,6 +232,30 @@ export default React.createClass({
 		});
 	},
 
+	showMediaDialog(params) {
+		const editor = this._editor;
+
+		const mediaElm = editor.selection.getNode()
+		const data = editor.namespaced.getMediaData(mediaElm);
+		const isFrame = data.type === 'iframe';
+
+		if (data.type === 'iframe') {
+			data.embed = editor.namespaced.getMediaHTML(data);
+		}
+
+		this.setState({
+			'media': Object.assign(
+				this.state.media,
+				{
+					'dialog'	: true,
+					'source' 	: isFrame ? '' : data.source1,
+					'embed' 	: isFrame ? data.embed : '',
+					'onSubmit': params.onSubmit,
+				}
+			),
+		});
+	},
+
 	handleLinkChange(key, value) {
 		const { link } = this.state;
 
@@ -254,6 +286,21 @@ export default React.createClass({
 		});
 	},
 
+	handleMediaChange(key, value) {
+		const { media } = this.state;
+
+		this.setState({
+			'media': Object.defineProperty(
+				media,
+				key,
+				{
+					'enumerable': true,
+					value,
+				}
+			),
+		});
+	},
+
 	handleLinkSubmit() {
 		this.hideLinkDialog(() => {
 			const { link } = this.state;
@@ -269,6 +316,15 @@ export default React.createClass({
 			(this._editor).focus();
 
 			image.onSubmit({ 'data': image });
+		});
+	},
+
+	handleMediaSubmit() {
+		this.hideMediaDialog(() => {
+			const { media } = this.state;
+			(this._editor).focus();
+
+			media.onSubmit({ 'data': media });
 		});
 	},
 
@@ -306,14 +362,33 @@ export default React.createClass({
 		});
 	},
 
+	hideMediaDialog(callback) {
+		this.setState({
+			'media': Object.assign(
+				this.state.media,
+				{
+					'dialog': false,
+				}
+			),
+		}, () => {
+			if (typeof callback === 'function') {
+				callback();
+			} else {
+				(this._editor).focus();
+			}
+		});
+	},
+
   render() {
 		const { handleLinkChange, handleLinkSubmit, hideLinkDialog } = this;
 		const { handleImageChange, handleImageSubmit, hideImageDialog } = this;
-		const { link, image } = this.state;
-		const { linkDialog, imageDialog } = this.props;
+		const { handleMediaChange, handleMediaSubmit, hideMediaDialog } = this;
+		const { link, image, media } = this.state;
+		const { linkDialog, imageDialog, mediaDialog } = this.props;
 
 		const LinkDialog = (linkDialog);
 		const ImageDialog = (imageDialog);
+		const MediaDialog = (mediaDialog);
 
     return (
       <section>
@@ -338,6 +413,14 @@ export default React.createClass({
 					onChange={handleImageChange}
 					onSubmit={handleImageSubmit}
 					onCancel={hideImageDialog}
+				/>
+
+				<MediaDialog
+					show={media.dialog}
+					data={media}
+					onChange={handleMediaChange}
+					onSubmit={handleMediaSubmit}
+					onCancel={hideMediaDialog}
 				/>
 			</section>
     );

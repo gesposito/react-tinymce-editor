@@ -532,6 +532,8 @@ tinymce.PluginManager.add('image', function(editor) {
 			// Create empty element to bypass logic bound to editor.windowManager.open
 			win = editor.windowManager.open({}).close();
 			// Advanced dialog shows general+advanced tabs
+
+			// Shows an external Dialog
 			editor.namespaced.showImageDialog({
 				title: 'Insert/edit image',
 				data: data,
