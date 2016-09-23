@@ -10,7 +10,7 @@ const cardStyles = {
   'width'           : 256,
   'height'          : 256,
   'backgroundColor' : '#f4f4f4',
-  'cursor'  : 'pointer',
+  'cursor'          : 'pointer',
 };
 
 const actionStyles = {
@@ -31,20 +31,32 @@ const iconStyles = {
 
 export default React.createClass({
   getInitialState() {
+    const { data } = this.props;
+
     return {
-      'showUrl': false,
+      'showUrl': !!data.src,
     };
   },
 
+  componentWillReceiveProps(nextProps) {
+    const { data } = nextProps;
+
+    this.setState({
+      'showUrl': !!data.src,
+    });
+  },
+
   onUploadImage() {
-    ReactDOM.findDOMNode(this.refs.file.refs.input).click();
+    const { file } = this.refs;
+    ReactDOM.findDOMNode(file.inputRef).click();
   },
 
   onAddImage() {
     this.setState({
       'showUrl': true,
     }, () => {
-      ReactDOM.findDOMNode(this.refs.src.refs.input).focus();
+      const { src } = this.refs;
+      ReactDOM.findDOMNode(src.inputRef).focus();
     });
   },
 
@@ -100,7 +112,7 @@ export default React.createClass({
             onChange={(e) => onChange('file', e.target.value)}
           />
           <Textfield
-            style={{ 'visibility': showUrl ? '' : 'hidden' }}
+            style={{ 'visibility': showUrl ? '' : 'hidden', 'width': '100%' }}
             ref="src"
             label="Paste a URL:"
             value={data.src}

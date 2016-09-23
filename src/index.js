@@ -248,8 +248,8 @@ export default React.createClass({
 				this.state.media,
 				{
 					'dialog'	: true,
-					'source' 	: isFrame ? '' : data.source1,
-					'embed' 	: isFrame ? data.embed : '',
+					'source' 	: data.source1 || '',
+					'embed' 	: data.embed || '',
 					'onSubmit': params.onSubmit,
 				}
 			),
