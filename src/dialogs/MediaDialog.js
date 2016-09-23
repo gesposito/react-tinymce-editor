@@ -45,21 +45,41 @@ export default React.createClass({
           </MDLComponent>
           <section>
             <div className="content">
-              <Textfield
-                ref="source"
-                style={{ 'display': activeTab === 0 ? '' : 'none' }}
-                label="Source:"
-                value={data.source}
-                onChange={(e) => onChange('source', e.target.value)}
-              />
-              <Textfield
-                ref="embed"
-                style={{ 'display': activeTab === 1 ? '' : 'none' }}
-                label="Embed code:"
-                value={data.embed}
-                onChange={(e) => onChange('embed', e.target.value)}
-                rows={5}
-              />
+              <div style={{ 'display': activeTab === 0 ? '' : 'none' }}>
+                <Textfield
+                  ref="source"
+                  label="Source:"
+                  value={data.source}
+                  onChange={(e) => onChange('source', e.target.value)}
+                />
+                <Textfield
+                  pattern="-?[0-9]*(\.[0-9]+)?"
+                  error="Please insert a number"
+                  label="Width"
+                  style={{ 'width': '200px' }}
+                  value={data.width}
+                  onChange={(e) => onChange('width', e.target.value)}
+                />
+                <Textfield
+                  pattern="-?[0-9]*(\.[0-9]+)?"
+                  error="Please insert a number"
+                  label="Height"
+                  style={{ 'width': '200px' }}
+                  value={data.height}
+                  onChange={(e) => onChange('height', e.target.value)}
+                />
+              </div>
+
+              <div style={{ 'display': activeTab === 1 ? '' : 'none' }}>
+                <Textfield
+                  ref="embed"
+                  label="Embed code:"
+                  value={data.embed}
+                  onChange={(e) => onChange('embed', e.target.value)}
+                  rows={5}
+                />
+              </div>
+
             </div>
           </section>
 

@@ -76,6 +76,8 @@ export default React.createClass({
 				'dialog': false,
 				'source': '',
 				'embed'	: '',
+				'width'	: 0,
+				'height': 0,
 			},
 
 		};
@@ -250,6 +252,8 @@ export default React.createClass({
 					'dialog'	: true,
 					'source' 	: data.source1 || '',
 					'embed' 	: data.embed || '',
+					'width'		: data.width || 640,
+					'height'	: data.height || 360,
 					'onSubmit': params.onSubmit,
 				}
 			),
