@@ -2,8 +2,7 @@ import React, { PropTypes } from 'react';
 import ReactDOM from 'react-dom';
 
 import { Dialog, DialogTitle, DialogContent, DialogActions, Textfield, Button } from 'react-mdl';
-import { Card, CardTitle, CardActions } from 'react-mdl';
-import { MdAddAPhoto, MdLanguage } from 'react-icons/lib/md';
+import { Card, CardTitle, CardActions, Icon } from 'react-mdl';
 
 const cardStyles = {
   'float'           : 'left',
@@ -14,19 +13,20 @@ const cardStyles = {
 };
 
 const actionStyles = {
-  'height'  : 52,
-  'padding' : 16,
+  'height'          : 52,
+  'padding'         : 16,
 };
 
 const captionStyles = {
-  'color'     : '#a4a4a4',
-  'fontSize'  : 14,
-  'fontWeight': '500',
+  'color'           : '#a4a4a4',
+  'fontSize'        : 14,
+  'fontWeight'      : '500',
 };
 
 const iconStyles = {
-  'position': 'absolute',
-  'margin'  : 100,
+  'position'        : 'absolute',
+  'margin'          : 100,
+  'fontSize'        : 60,
 };
 
 export default React.createClass({
@@ -40,6 +40,7 @@ export default React.createClass({
 
   componentWillReceiveProps(nextProps) {
     const { data } = nextProps;
+    if (this.props.show) return;
 
     this.setState({
       'showUrl': !!data.src,
@@ -84,7 +85,7 @@ export default React.createClass({
         <DialogContent>
           <Card shadow={0} style={cardStyles} onClick={onUploadImage}>
             <CardTitle expand />
-            <MdAddAPhoto size={60} style={iconStyles} />
+            <Icon name="photo" style={iconStyles} />
 
             <CardActions style={actionStyles}>
               <span style={captionStyles}>
@@ -95,7 +96,7 @@ export default React.createClass({
 
           <Card shadow={0} style={cardStyles} onClick={onAddImage}>
             <CardTitle expand />
-            <MdLanguage size={60} style={iconStyles} />
+            <Icon name="language" style={iconStyles} />
 
             <CardActions style={actionStyles}>
               <span style={captionStyles}>

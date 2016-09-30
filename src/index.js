@@ -10,6 +10,7 @@ import tinymce from 'tinymce/tinymce';
 import 'tinymce/themes/modern/theme';
 
 import 'tinymce/skins/lightgray/skin.min.css';
+import './index.css';
 
 // Plugins
 import 'tinymce/plugins/autolink/plugin';
