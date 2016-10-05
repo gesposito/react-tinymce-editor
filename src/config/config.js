@@ -15,6 +15,7 @@ module.exports = {
     'image',
     'link',
     'media',
+    'embed',
   ],
 
   'toolbar': [
@@ -25,7 +26,7 @@ module.exports = {
     'indent, outdent',
     'formatselect, fontselect, fontsizeselect forecolor',
     'cut, copy, paste, undo, redo, removeformat',
-    'image media',
+    'image media embed',
     'preview fullscreen',
 
   ].join(' | '),
