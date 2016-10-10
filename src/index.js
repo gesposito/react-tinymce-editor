@@ -299,12 +299,12 @@ export default React.createClass({
 		const { link } = this.state;
 
 		this.setState({
-			'link': Object.defineProperty(
+			'link': Object.assign(
+				{},
 				link,
 				key,
 				{
-					'enumerable': true,
-					value,
+					[key]: value,
 				}
 			),
 		});
@@ -314,12 +314,12 @@ export default React.createClass({
 		const { image } = this.state;
 
 		this.setState({
-			'image': Object.defineProperty(
+			'image': Object.assign(
+				{},
 				image,
 				key,
 				{
-					'enumerable': true,
-					value,
+					[key]: value,
 				}
 			),
 		});
@@ -329,12 +329,12 @@ export default React.createClass({
 		const { media } = this.state;
 
 		this.setState({
-			'media': Object.defineProperty(
+			'media': Object.assign(
+				{},
 				media,
 				key,
 				{
-					'enumerable': true,
-					value,
+					[key]: value,
 				}
 			),
 		});
@@ -344,12 +344,12 @@ export default React.createClass({
 		const { embed } = this.state;
 
 		this.setState({
-			'embed': Object.defineProperty(
+			'embed': Object.assign(
+				{},
 				embed,
 				key,
 				{
-					'enumerable': true,
-					value,
+					[key]: value,
 				}
 			),
 		});
